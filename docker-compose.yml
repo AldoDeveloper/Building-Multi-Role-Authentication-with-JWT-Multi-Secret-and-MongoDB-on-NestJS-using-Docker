@@ -1,0 +1,55 @@
+version: '1.0'
+
+services:
+  apps_backend:
+
+    volumes:
+      - .:/usr/src/backend
+      - /usr/src/backend/node_modules
+
+    build: 
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: apps_backends
+
+    ports:
+      - 4000:4000
+    
+    env_file:
+      - ./env/dev.env
+      - ./env/prod.env
+      
+    networks:
+      - network_mongo
+      
+    depends_on:
+      - mongodb_apps
+
+    environment:
+      - NODE_ENV=prod
+      
+    command: npm run start:prod
+
+  mongodb_apps:
+  
+    image: mongo:latest
+
+    restart: always
+
+    ports:
+      - 27017:27017
+
+    networks:
+      - network_mongo
+
+    container_name: mongodb_multi_auth
+
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo1999
+      - MONGO_INITDB_ROOT_PASSWORD=Mongo12345^^
+      - MONGO_INITDB_DATABASE=app_db
+
+networks:
+  network_mongo: 
+     driver: bridge
